@@ -1,5 +1,6 @@
 ﻿using StardewModdingAPI;
 using StardewValley;
+using System;
 
 namespace CraftPriority
 {
@@ -12,9 +13,6 @@ namespace CraftPriority
 
         private void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
-            const string occupied = "▓";
-            const string free = "░";
-
             if (e.Button.IsActionButton())
             {
                 Farmer player = Game1.player;
@@ -36,49 +34,33 @@ namespace CraftPriority
                         int py = player.getTileY();
 
                         bool preventEating = false;
+                        //Test for "action" blocks around the player
                         for (int y = -1; y <= 1 && !preventEating; y++)
                         {
-                            string occupants = "";
                             for (int x = -1; x <= 1 && !preventEating; x++)
                             {
-                                if (x == 0 && y == 0)
-                                {
-                                    occupants += "P";
-                                }
-                                else
+                                if (x != 0 && y != 0)
                                 {
                                     StardewValley.Object tile = Game1.currentLocation.getObjectAtTile(px + x, py + y);
-
                                     if (tile != null)
                                     {
+                                        //Make a copy to prevent modification of the real object
                                         StardewValley.Object tileCopy = new StardewValley.Object(tile.TileLocation, tile.ParentSheetIndex);
                                         tileCopy.Name = tile.Name;
+
+                                        // For a picky setting?
                                         //tileCopy.heldObject.Set(tile.heldObject.Value);
 
+                                        //If a action can be performed, prevent the player from eating the object
                                         preventEating = tileCopy.performObjectDropInAction(activeObj, true, player);
-                                        occupants += preventEating ? occupied : free;
-                                    }
-                                    else
-                                    {
-                                        occupants += free;
                                     }
                                 }
                             }
-                            Monitor.Log(occupants, LogLevel.Warn);
                         }
-                        Monitor.Log("", LogLevel.Alert);
 
-                        if (preventEating)
-                        {
-                            //The object can be used in the surrounding tiles.
-                            //BAN IT!
-                            activeObj.Edibility = -300;
-                        }
-                        else
-                        {
-                            //Unban the object and make it edible again
-                            activeObj.Edibility = actualEdibility;
-                        }
+                        //If the object can be used in the surrounding tiles: BAN IT!
+                        // otherwise unban the object and make it edible again
+                        activeObj.Edibility = preventEating ? -300 : actualEdibility;
                     }
                 }
             }
