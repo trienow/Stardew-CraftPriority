@@ -20,7 +20,7 @@ namespace CraftPriority
                 if (activeObj != null)
                 {
                     int actualEdibility = activeObj.Edibility;
-                    if (actualEdibility == -300)
+                    if (actualEdibility == -300 && !activeObj.isPlaceable()) //isPlacable prevents machines turning into food (e.g. Chest -> Tuna)
                     {
                         //Create a dummy object and check if it normally has a different edibility
                         StardewValley.Object objReference = new StardewValley.Object(activeObj.ParentSheetIndex, activeObj.Stack, activeObj.IsRecipe, activeObj.Price, activeObj.Quality);
