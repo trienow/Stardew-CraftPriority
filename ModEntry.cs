@@ -1,6 +1,6 @@
 ﻿using StardewModdingAPI;
 using StardewValley;
-using System;
+using StardewValley.Objects;
 
 namespace CraftPriority
 {
@@ -16,14 +16,14 @@ namespace CraftPriority
             if (e.Button.IsActionButton())
             {
                 Farmer player = Game1.player;
-                StardewValley.Object activeObj = player.ActiveObject;
+                Object activeObj = player.ActiveObject;
                 if (activeObj != null)
                 {
                     int actualEdibility = activeObj.Edibility;
                     if (actualEdibility == -300 && !activeObj.isPlaceable()) //isPlacable prevents machines turning into food (e.g. Chest -> Tuna)
                     {
                         //Create a dummy object and check if it normally has a different edibility
-                        StardewValley.Object objReference = new StardewValley.Object(activeObj.ParentSheetIndex, activeObj.Stack, activeObj.IsRecipe, activeObj.Price, activeObj.Quality);
+                        Object objReference = new Object(activeObj.ParentSheetIndex, activeObj.Stack, activeObj.IsRecipe, activeObj.Price, activeObj.Quality);
                         actualEdibility = objReference.Edibility;
                     }
 
@@ -41,14 +41,33 @@ namespace CraftPriority
                             {
                                 if (x != 0 && y != 0)
                                 {
-                                    StardewValley.Object tile = Game1.currentLocation.getObjectAtTile(px + x, py + y);
+                                    Object tile = Game1.currentLocation.getObjectAtTile(px + x, py + y);
                                     if (tile != null)
                                     {
-                                        //Make a copy to prevent modification of the real object
-                                        StardewValley.Object tileCopy = new StardewValley.Object(tile.TileLocation, tile.ParentSheetIndex);
-                                        tileCopy.Name = tile.Name;
+                                        Object tileCopy = null;
 
-                                        // For a picky setting?
+                                        //Make a copy to prevent modification of the real object
+                                        if (tile is Cask)
+                                        {
+                                            //Casks have more properties, so copy it separately
+                                            tileCopy = new Cask();
+                                        }
+                                        else
+                                        {
+                                            tileCopy = new Object(tile.TileLocation, tile.ParentSheetIndex);
+                                            tileCopy.Name = tile.Name;
+                                        }
+
+                                        //Just in case... (maybe due to an update in the future...?)
+                                        if (tileCopy == null)
+                                        {
+                                            string log = "Copying tile failed. Please report to https://github.com/trienow/Stardew-CraftPriority/issues/new or https://www.nexusmods.com/stardewvalley/mods/4174?tab=bugs\r\n" +
+                                                $"Tile to copy: '{tile.Name}'\r\nThanks! -TR";
+                                            Monitor.Log(log, LogLevel.Error);
+                                            continue;
+                                        }
+
+                                        //To ignore filled machines:
                                         //tileCopy.heldObject.Set(tile.heldObject.Value);
 
                                         //If a action can be performed, prevent the player from eating the object
