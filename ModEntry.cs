@@ -44,7 +44,7 @@ namespace CraftPriority
                                     Object tile = Game1.currentLocation.getObjectAtTile(px + x, py + y);
                                     if (tile != null)
                                     {
-                                        Object tileCopy = null;
+                                        Object tileCopy;
 
                                         //Make a copy to prevent modification of the real object
                                         if (tile is Cask)
