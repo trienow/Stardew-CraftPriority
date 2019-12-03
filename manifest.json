@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Craft Priority",
   "Author": "trienow",
-  "Version": "1.1.1",
+  "Version": "1.2.0",
   "Description": "Prevents eating, when trying to mass fill casks, kegs, etc.",
   "UniqueID": "de.trienow.stardew.craftpriority",
   "EntryDll": "CraftPriority.dll",
